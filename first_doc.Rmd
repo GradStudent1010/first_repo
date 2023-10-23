@@ -1,0 +1,148 @@
+---
+title: "Simple Linear Regression - Homework 1 - STAT 571A"
+author: "Daniel Flick"
+date: "Due: September 8, 2023"
+output:
+  pdf_document
+fontsize: 12pt  
+header-includes:
+- \renewcommand*\familydefault{\sfdefault} %% this picks a sans serif font
+- \usepackage[T1]{fontenc}
+---
+```{r setup, echo=F}
+knitr::opts_chunk$set(cache = F)
+```
+
+
+```{r, eval=F}
+install.packages('tinytex')
+tinytex::install_tinytex()
+```
+
+### I. Mathematical Derivations
+
+\begin{flushleft}
+(1) Show that Cov($e_i$,$e_j$) = -$\frac{\sigma^2}{n}$
+\end{flushleft}
+
+Cov($e_i$,$e_j$) = E[($Y_i$ - $\bar{Y}$)($Y_j$-$\bar{Y}$)] - E[($Y_i$ - $\bar{Y}$)]E[($Y_j$ - $\bar{Y}$)]
+
+= E[$Y_iY_j$ - $Y_i\bar{Y}$ - $Y_j\bar{Y}$ + $\bar{Y}^2$] - 0 (as E[$Y_i$] = E[$Y_j$] = E[$\bar{Y}$] = $\mu$)
+
+= E[$Y_i$]E[$Y_j$] - E[$Y_i$[$\frac{\sum_{k=1}^{n}Y_k}{n}$]] -   E[$Y_j$[$\frac{\sum_{k=1}^{n}Y_k}{n}$]] + E[$\bar{Y}^2$]
+
+We note:  Var($\bar{Y}$) = $\frac{\sigma^2}{n}$ = E[$\bar{Y}^2$] - E[$\bar{Y}^2$], 
+==> $\frac{\sigma^2}{n}$ = E[$\bar{Y}^2$] - $\mu^2$ ==> E[$\bar{Y}^2$] = $\frac{\sigma^2}{n}$ + $\mu^2$
+
+So we have:
+
+$\mu^2$ - $\frac{1}{n}$E[$Y_i^2$ + $\sum_{k\not=i}^{}Y_iY_k$] - $\frac{1}{n}$E[$Y_j^2$ + $\sum_{k\not=j}^{}Y_jY_k$] + ($\frac{\sigma^2}{n}$ + $\mu^2$)
+
+We note:  Var($Y_i$) = Var($Y_j$) = E[$Y_i^2$] - $\mu^2$ ==> E[$Y_i^2$] = E[$Y_j^2$] = $\sigma^2$ + $\mu^2$
+
+So, finally, we have:
+
+$\mu^2$ - $\frac{1}{n}$[$\sigma^2$ + $\mu^2$ + (n-1)$\mu^2$] - $\frac{1}{n}$[$\sigma^2$ + $\mu^2$ + (n-1)$\mu^2$] + $\frac{\sigma^2}{n}$ + $\mu^2$
+
+= $\mu^2$ - $\frac{\sigma^2}{n}$ - $\frac{\mu^2}{n}$ - $\frac{(n-1)\mu^2}{n}$ -  $\frac{\sigma^2}{n}$ - $\frac{\mu^2}{n}$ - $\frac{(n-1)\mu^2}{n}$ + $\frac{\sigma^2}{n}$ + $\mu^2$
+
+= 2$\mu^2$ - $\mu^2$ - $\frac{\sigma^2}{n}$ - $\mu^2$
+
+= -$\frac{\sigma^2}{n}$
+
+
+\bigskip
+
+ALRM 1.5:
+
+No.  E[$Y_i$] = $\beta_0 + \beta_1X_i$ + E[$\epsilon_i$] since $Y_i$ = $\beta_0 + \beta_1X_i + \epsilon_i$, where E[$\epsilon_i$] = 0
+
+Therefore, E[$Y_i$] = $\beta_0$ + $\beta_1X_i$ + 0 =  $\beta_0$ + $\beta_1X_i$
+ 
+(We note that $\beta_0$, $\beta_1$ and $X_i$ are all constants, so their expected values and constant values are identical)
+
+\bigskip
+
+ALRM: 1.7
+
+\begin{flushleft}
+
+(a) No.  While we know that $\sigma^2$=25, we do not know the underlying distribution with which this variance is associated.  We could asssume the underlying distribution is approximately normal and then calculate the $\textit{approximate}$ probability of falling between 195 and 205 - but without knowing the underlying distribution governing the error terms, we cannot calculate an $\textit{exact}$ probability.
+
+
+
+(b) Yes.  Since we know the underlying distribution is N~(0,$\sigma^2$=25) - and because we know $\beta_0$, $\beta_1$ and X=5, we can calculate that:
+
+\end{flushleft}
+
+$Y_i$ = $\beta_0$ + $\beta_1X_i$ + $\epsilon_i$ = 100 + 20(5) + $\epsilon_i$ = 200 + $\epsilon_i$
+
+The P(195 < $Y_i$ < 205) = P (-5 < $\epsilon_i$ < 5) = P(-1 < z < 1) = 0.68268
+
+\bigskip
+
+ALRM: 1.12
+
+\begin{flushleft}
+
+(a) Observational.  The subjects were not randomly assigned to a specific exercise time.  Instead, the study merely made us of data wherein exercise time and frequency of colds were captured/analyzed.
+
+(b) Increased exercise is associated with a lower freqeuncy of colds, but this does not mean exercise $\textit{causes}$ cold frequency to decrease.  Association is not causation.
+
+(c) 
+
+(1) Those who exercise more may also drink more water, and higher water intake may cause lower cold frequency.
+
+(2) Those who exercise more may eat more fruits/vegetables, which may lower cold frequency.
+
+(3) Those who exercise more may have unique genetic compositions that make them less prone to catching a cold.
+
+\end{flushleft}
+
+
+
+
+
+
+
+
+
+
+
+
+(2) 
+
+```{r, fig.width=5, fig.height=4}
+
+library("ggplot2")
+
+tree <- read.csv(file = 'Tree_Equity_Scores_Tucson_noNA.csv')
+
+
+nrow(tree)
+
+attach(tree)
+plot(PCTTreeCover ~ PCTPoverty)
+
+fitted <- lm(PCTTreeCover ~ PCTPoverty, data = tree)
+
+ggplot(tree, aes(x=PCTPoverty, y= PCTTreeCover)) + geom_point() + stat_smooth(method='lm')
+
+summary(fitted)
+
+newdata = data.frame(PCTPoverty = 50 )
+predict(fitted, newdata)
+
+MLE <- sum(resid(fitted)^2)/nrow(tree)
+print (MLE)
+
+
+
+```
+
+### II. Second section
+
+(3) Make sure you read about `cache`-ing: https://bookdown.org/yihui/rmarkdown-cookbook/cache.html
+
+(4) If you can't get your R Markdown document to render as a PDF, you can try rendering it to HTML, and then "printing" the .html file to a PDF using any internet browser. 
+
