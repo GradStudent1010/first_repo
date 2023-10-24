@@ -25,7 +25,7 @@ tinytex::install_tinytex()
 (1) Show that Cov($e_i$,$e_j$) = -$\frac{\sigma^2}{n}$
 \end{flushleft}
 
-Cov($e_i$,$e_j$) = E[($Y_i$ - $\bar{Y}$)($Y_j$-$\bar{Y}$)] - E[($Y_i$ - $\bar{Y}$)]E[($Y_j$ - $\bar{Y}$)]
+Cov($e_j$) = E[($Y_i$ - $\bar{Y}$)($Y_j$-$\bar{Y}$)] - E[($Y_i$ - $\bar{Y}$)]E[($Y_j$ - $\bar{Y}$)]
 
 = E[$Y_iY_j$ - $Y_i\bar{Y}$ - $Y_j\bar{Y}$ + $\bar{Y}^2$] - 0 (as E[$Y_i$] = E[$Y_j$] = E[$\bar{Y}$] = $\mu$)
 
@@ -106,43 +106,4 @@ ALRM: 1.12
 
 
 
-
-
-
-
-(2) 
-
-```{r, fig.width=5, fig.height=4}
-
-library("ggplot2")
-
-tree <- read.csv(file = 'Tree_Equity_Scores_Tucson_noNA.csv')
-
-
-nrow(tree)
-
-attach(tree)
-plot(PCTTreeCover ~ PCTPoverty)
-
-fitted <- lm(PCTTreeCover ~ PCTPoverty, data = tree)
-
-ggplot(tree, aes(x=PCTPoverty, y= PCTTreeCover)) + geom_point() + stat_smooth(method='lm')
-
-summary(fitted)
-
-newdata = data.frame(PCTPoverty = 50 )
-predict(fitted, newdata)
-
-MLE <- sum(resid(fitted)^2)/nrow(tree)
-print (MLE)
-
-
-
-```
-
-### II. Second section
-
-(3) Make sure you read about `cache`-ing: https://bookdown.org/yihui/rmarkdown-cookbook/cache.html
-
-(4) If you can't get your R Markdown document to render as a PDF, you can try rendering it to HTML, and then "printing" the .html file to a PDF using any internet browser. 
 
